@@ -20,6 +20,7 @@ import codes.umair.wastatussaver.fragments.SavedStatusFragment
 import com.nabinbhandari.android.permissions.PermissionHandler
 import com.nabinbhandari.android.permissions.Permissions
 import kotlinx.android.synthetic.main.activity_main.*
+import umairayub.madialog.MaDialog
 
 
 class MainActivity : AppCompatActivity() {
@@ -109,6 +110,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when {
+            item.itemId === R.id.action_help -> {
+                help()
+            }
+            item.itemId === R.id.action_share -> {
+                share()
+            }
             item.itemId === R.id.action_rateus -> {
                 rateUs()
             }
@@ -136,8 +143,26 @@ class MainActivity : AppCompatActivity() {
         val emailIntent = Intent(Intent.ACTION_SENDTO)
         emailIntent.data = Uri.parse("mailto:umairayub79@gmail.com")
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name) + " Feedback")
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name) + " Feedback")
         startActivity(Intent.createChooser(emailIntent, "Send Feedback!"))
+    }
+
+    private fun share() {
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "text/plain"
+        shareIntent.putExtra(
+            Intent.EXTRA_TEXT,
+            "Hey, Check out this Awesome Status Saver app.\nThis app Lets you save WhatsApp Status Images and Video.\nDownload Now : https://play.google.com/store/apps/details?id=$packageName"
+        )
+        startActivity(Intent.createChooser(shareIntent, "Share!"))
+    }
+
+    private fun help() {
+        MaDialog.Builder(this)
+            .setTitle("Help")
+            .setMessage(resources.getString(R.string.help_message))
+            .setPositiveButtonText("OK")
+            .setPositiveButtonListener {}
+            .build()
     }
 }
 

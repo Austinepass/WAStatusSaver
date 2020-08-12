@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Status Saver</string>
+    <string name="help_message">"● Check status on WhatsApp.\n● Open or come back to status saver app.\n● Choose photo or video status to download.\n● Click on photo or video to preview or click on save button to save.\n● You can check your saved status in Second tab (Saved Status)."</string>
 </resources>
