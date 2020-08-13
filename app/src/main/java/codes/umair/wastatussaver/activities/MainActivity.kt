@@ -151,7 +151,7 @@ class MainActivity : AppCompatActivity() {
         shareIntent.type = "text/plain"
         shareIntent.putExtra(
             Intent.EXTRA_TEXT,
-            "Hey, Check out this Awesome Status Saver app.\nThis app Lets you save WhatsApp Status Images and Video.\nDownload Now : https://play.google.com/store/apps/details?id=$packageName"
+            "Hey, Check out this Awesome Status Saver app.\nThis app Lets you save WhatsApp Status Images and Videos.\nDownload Now : https://play.google.com/store/apps/details?id=$packageName"
         )
         startActivity(Intent.createChooser(shareIntent, "Share!"))
     }
