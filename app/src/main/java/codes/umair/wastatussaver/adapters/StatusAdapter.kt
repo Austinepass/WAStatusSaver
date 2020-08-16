@@ -15,6 +15,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import codes.umair.wastatussaver.R
 import codes.umair.wastatussaver.activities.ImageActivity
@@ -33,8 +34,7 @@ class StatusAdapter(
     private val activity: Context,
     private val filesList: ArrayList<File>,
     private val saved: Boolean
-) :
-    RecyclerView.Adapter<StatusAdapter.FileHolder>() {
+) : RecyclerView.Adapter<StatusAdapter.FileHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileHolder {
@@ -45,6 +45,7 @@ class StatusAdapter(
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onBindViewHolder(holder: FileHolder, position: Int) {
+
         val currentFile = filesList[position]
         if (saved) {
             holder.button1.background = activity.getDrawable(R.drawable.ic_delete)
@@ -108,14 +109,32 @@ class StatusAdapter(
 
     private fun shareMediaItem(sourceFile: File, isImage: Boolean): View.OnClickListener {
         return View.OnClickListener {
-            val intent = Intent(Intent.ACTION_SEND)
-            if (isImage) {
-                intent.type = "image/*"
-            } else {
-                intent.type = "video/*"
+
+            try {
+                val fileDirPath =
+                    File(Environment.getExternalStorageDirectory(), "/WhatsApp/Media/.Statuses/")
+                fileDirPath.mkdirs()
+                val file = File(fileDirPath, sourceFile.name)
+                val contentUri: Uri =
+                    FileProvider.getUriForFile(
+                        activity,
+                        "codes.umair.wastatussaver.fileprovider",
+                        file
+                    )
+
+                val intent = Intent(Intent.ACTION_SEND)
+                if (isImage) {
+                    intent.type = "image/*"
+                } else {
+                    intent.type = "video/*"
+                }
+                intent.putExtra(Intent.EXTRA_STREAM, contentUri)
+                activity.startActivity(Intent.createChooser(intent, "Share via "))
+            } catch (e: IOException) {
+                throw RuntimeException("Error generating file", e)
             }
-            intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(sourceFile))
-            activity.startActivity(Intent.createChooser(intent, "Share via "))
+
+
         }
     }
 

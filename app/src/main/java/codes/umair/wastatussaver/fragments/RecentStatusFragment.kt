@@ -68,7 +68,6 @@ class RecentStatusFragment : Fragment() {
 
     companion object {
         private const val WHATSAPP_STATUSES_LOCATION = "/WhatsApp/Media/.Statuses"
-        const val TAG = "Home"
     }
 
 
