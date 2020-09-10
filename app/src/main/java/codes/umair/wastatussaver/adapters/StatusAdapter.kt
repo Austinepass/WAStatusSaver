@@ -88,20 +88,21 @@ class StatusAdapter(
 
     private fun downloadMediaItem(sourceFile: File): View.OnClickListener {
         return View.OnClickListener {
+            val path =
+                Environment.getExternalStorageDirectory().toString() + DIRECTORY_TO_SAVE_MEDIA_NOW
+            val dstfile = File(path, sourceFile.name)
             Runnable {
                 try {
-                    copyFile(
-                        sourceFile,
-                        File(
-                            Environment.getExternalStorageDirectory()
-                                .toString() + DIRECTORY_TO_SAVE_MEDIA_NOW + sourceFile.name
-                        )
-                    )
+                    copyFile(sourceFile, dstfile)
                     Toast.makeText(activity, "saved!", Toast.LENGTH_SHORT).show()
+                        val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                        val contentUri = Uri.fromFile(dstfile)
+                        mediaScanIntent.data = contentUri
+                        activity.sendBroadcast(mediaScanIntent)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     Log.e("RecyclerV", "onClick: Error:" + e.message)
-                    Toast.makeText(activity, "unable to save", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, "unable to save\n" + e.localizedMessage, Toast.LENGTH_LONG).show()
                 }
             }.run()
         }
@@ -178,22 +179,12 @@ class StatusAdapter(
     }
 
     class FileHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var statusItemView: ImageView
-        var statusItemType: TextView
-        var button1: Button
-        var buttonShare: Button
+        var statusItemView: ImageView = itemView.findViewById<View>(R.id.videoView) as ImageView
+        var statusItemType: TextView = itemView.findViewById<View>(R.id.itemType) as TextView
+        var button1: Button = itemView.findViewById<View>(R.id.btn1) as Button
+        var buttonShare: Button = itemView.findViewById<View>(R.id.btn_share) as Button
 
 
-        init {
-            statusItemView =
-                itemView.findViewById<View>(R.id.videoView) as ImageView
-            button1 =
-                itemView.findViewById<View>(R.id.btn1) as Button
-            buttonShare =
-                itemView.findViewById<View>(R.id.btn_share) as Button
-            statusItemType =
-                itemView.findViewById<View>(R.id.itemType) as TextView
-        }
     }
 
     companion object {
