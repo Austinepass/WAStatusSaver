@@ -5,17 +5,21 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorPrimary</item>
-        <item name="colorControlHighlight">@color/colorControlHighlight</item>
-        <item name="colorControlNormal">@color/colorControlNormal</item>
+<!--        <item name="colorControlHighlight">@color/colorControlHighlight</item>-->
+<!--        <item name="colorControlNormal">@color/colorControlNormal</item>-->
+        <item name="windowActionModeOverlay">true</item>
     </style>
 
     <style name="Studio" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorPrimary</item>
-        <item name="colorControlHighlight">@color/colorControlHighlight</item>
-        <item name="colorControlNormal">@color/colorControlNormal</item>
+<!--        <item name="colorControlHighlight">@color/colorControlHighlight</item>-->
+<!--        <item name="colorControlNormal">@color/colorControlNormal</item>-->
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeBackground">@color/colorPrimary</item>
     </style>
+
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 

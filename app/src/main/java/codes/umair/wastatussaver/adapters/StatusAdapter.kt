@@ -2,80 +2,39 @@ package codes.umair.wastatussaver.adapters
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.util.Log
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import codes.umair.wastatussaver.R
 import codes.umair.wastatussaver.activities.ImageActivity
 import codes.umair.wastatussaver.activities.VideoActivity
 import com.bumptech.glide.Glide
-import umairayub.madialog.MaDialog
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.IOException
-import java.nio.channels.FileChannel
 import java.util.*
+import kotlin.collections.ArrayList
 
 
-class StatusAdapter(
-    private val activity: Context,
-    private val filesList: ArrayList<File>,
-    private val saved: Boolean
-) : RecyclerView.Adapter<StatusAdapter.FileHolder>() {
+class StatusAdapter(private val activity: Context, private val filesList: ArrayList<File>, private val saved: Boolean, private val listener: OnItemClickListener) : RecyclerView.Adapter<StatusAdapter.FileHolder>() {
 
+    val selectedFilesList: ArrayList<File> = ArrayList()
+    private var mListener: OnItemClickListener? = listener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileHolder {
-        val inflatedView: View = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item, parent, false)
-        return FileHolder(inflatedView)
+        return FileHolder(LayoutInflater.from(parent.context).inflate(R.layout.item, parent, false),listener)
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onBindViewHolder(holder: FileHolder, position: Int) {
-
-        val currentFile = filesList[position]
-        if (saved) {
-            holder.button1.background = activity.getDrawable(R.drawable.ic_delete)
-            holder.button1.setOnClickListener(deleteMediaItem(currentFile))
-        } else {
-            holder.button1.background = activity.getDrawable(R.drawable.ic_save)
-            holder.button1.setOnClickListener(downloadMediaItem(currentFile))
-        }
-        val status = currentFile.absolutePath
-        if (status.endsWith(".mp4")) {
-            holder.statusItemType.text = "Video"
-            holder.buttonShare.setOnClickListener(shareMediaItem(currentFile, false))
-        } else {
-            holder.statusItemType.text = "Image"
-            holder.buttonShare.setOnClickListener(shareMediaItem(currentFile, true))
-        }
-
-        Glide.with(activity)
-            .load(status)
-            .into(holder.statusItemView)
-
-        holder.itemView.setOnClickListener {
-            if (status.endsWith(".mp4")) {
-                val intent = Intent(activity, VideoActivity::class.java)
-                intent.putExtra("videoPath", status)
-                activity.startActivity(intent)
-            } else {
-                val intent = Intent(activity, ImageActivity::class.java)
-                intent.putExtra("ImagePath", status)
-                activity.startActivity(intent)
+        when (holder) {
+            is FileHolder -> {
+                holder.bind(filesList[position])
             }
 
         }
@@ -85,135 +44,101 @@ class StatusAdapter(
         return filesList.size
     }
 
-
-    private fun downloadMediaItem(sourceFile: File): View.OnClickListener {
-        return View.OnClickListener {
-            val path =
-                Environment.getExternalStorageDirectory().toString() + DIRECTORY_TO_SAVE_MEDIA_NOW
-            val dstfile = File(path, sourceFile.name)
-            Runnable {
-                try {
-                    copyFile(sourceFile, dstfile)
-                    Toast.makeText(activity, "saved!", Toast.LENGTH_SHORT).show()
-                        val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
-                        val contentUri = Uri.fromFile(dstfile)
-                        mediaScanIntent.data = contentUri
-                        activity.sendBroadcast(mediaScanIntent)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Log.e("RecyclerV", "onClick: Error:" + e.message)
-                    Toast.makeText(activity, "unable to save\n" + e.localizedMessage, Toast.LENGTH_LONG).show()
-                }
-            }.run()
-        }
+    private fun isSelected(file: File): Boolean{
+        return selectedFilesList.contains(file)
     }
 
-    private fun shareMediaItem(sourceFile: File, isImage: Boolean): View.OnClickListener {
-        return View.OnClickListener {
-
-            try {
-                val fileDirPath =
-                    File(Environment.getExternalStorageDirectory(), "/WhatsApp/Media/.Statuses/")
-                fileDirPath.mkdirs()
-                val file = File(fileDirPath, sourceFile.name)
-                val contentUri: Uri =
-                    FileProvider.getUriForFile(
-                        activity,
-                        "codes.umair.wastatussaver.fileprovider",
-                        file
-                    )
-
-                val intent = Intent(Intent.ACTION_SEND)
-                if (isImage) {
-                    intent.type = "image/*"
-                } else {
-                    intent.type = "video/*"
-                }
-                intent.putExtra(Intent.EXTRA_STREAM, contentUri)
-                activity.startActivity(Intent.createChooser(intent, "Share via "))
-            } catch (e: IOException) {
-                throw RuntimeException("Error generating file", e)
-            }
 
 
-        }
+    interface OnItemClickListener {
+        fun onItemLongClicked(position: Int)
+        fun onItemClicked(position: Int)
     }
 
-    private fun deleteMediaItem(sourceFile: File): View.OnClickListener {
-        return View.OnClickListener {
-            Runnable {
-                try {
-                    if (sourceFile.exists()) {
-                        MaDialog.Builder(activity)
-                            .setTitle("Delete?")
-                            .setTitleTextColor(Color.RED)
-                            .setMessage("Are you sure you want to delete this file?")
-                            .setPositiveButtonText("Yes")
-                            .setNegativeButtonText("Cancel")
-                            .setPositiveButtonListener {
-                                sourceFile.delete()
-                                if (!sourceFile.exists()) {
-                                    filesList.remove(sourceFile)
-                                    notifyDataSetChanged()
-                                    Toast.makeText(
-                                        activity,
-                                        "File deleted!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-                            .setNegativeButtonListener {
 
-                            }
-                            .build()
-
-
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Log.e("RecyclerV", "onClick: Error:" + e.message)
-                    Toast.makeText(activity, "unable to delete", Toast.LENGTH_SHORT).show()
-                }
-            }.run()
+    fun toggleSelection(pos: Int) {
+        val currentSelectedIndex = filesList[pos]
+        if (selectedFilesList.contains(currentSelectedIndex)) {
+            selectedFilesList.remove(currentSelectedIndex)
+        } else {
+            selectedFilesList.add(currentSelectedIndex)
         }
+        notifyItemChanged(pos)
     }
 
-    class FileHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+//    fun selectAll() {
+//        for (i in 0 until filesList.size){
+//            if (!selectedFilesList.contains(filesList[i])){
+//                selectedFilesList.add(filesList[i])
+//                notifyDataSetChanged()
+//            }
+//
+//        }
+//    }
+
+    fun clearSelections() {
+        selectedFilesList.clear();
+        notifyDataSetChanged();
+    }
+
+    fun getSelectedItemCount(): Int {
+        return selectedFilesList.size
+    }
+
+    fun getSelectedItems(): ArrayList<File> {
+        return selectedFilesList;
+    }
+
+    fun removeItem(file: File) {
+        filesList.remove(file);
+        notifyDataSetChanged()
+    }
+
+    fun isVideo(currentFile: File):Boolean{
+        return currentFile.extension == "mp4"
+    }
+
+    inner class FileHolder constructor(itemView: View,listener: OnItemClickListener) : RecyclerView.ViewHolder(itemView), View.OnLongClickListener {
+
         var statusItemView: ImageView = itemView.findViewById<View>(R.id.videoView) as ImageView
         var statusItemType: TextView = itemView.findViewById<View>(R.id.itemType) as TextView
-        var button1: Button = itemView.findViewById<View>(R.id.btn1) as Button
-        var buttonShare: Button = itemView.findViewById<View>(R.id.btn_share) as Button
+        var activity: Context = itemView.context
+        var listener = listener
 
 
-    }
+        fun bind(currentFile: File) {
+            val status = currentFile.absolutePath
 
-    companion object {
-        private const val DIRECTORY_TO_SAVE_MEDIA_NOW = "/Status Saver/"
-
-        /**
-         * copy file to destination.
-         *
-         * @param sourceFile
-         * @param destFile
-         * @throws IOException
-         */
-        @Throws(IOException::class)
-        fun copyFile(sourceFile: File?, destFile: File) {
-            if (!destFile.parentFile.exists()) destFile.parentFile.mkdirs()
-            if (!destFile.exists()) {
-                destFile.createNewFile()
+            if (isVideo(currentFile)) {
+                statusItemType.text = "Video"
+            } else {
+                statusItemType.text = "Image"
             }
-            var source: FileChannel? = null
-            var destination: FileChannel? = null
-            try {
-                source = FileInputStream(sourceFile).channel
-                destination = FileOutputStream(destFile).channel
-                destination.transferFrom(source, 0, source.size())
-            } finally {
-                source?.close()
-                destination?.close()
+
+            Glide.with(activity)
+                .load(status)
+                .into(statusItemView)
+
+            if (isSelected(currentFile)){
+                itemView.scaleX = 0.9f;
+                itemView.scaleY = 0.9f;
+                statusItemView.alpha = 0.5f
+            }else{
+                statusItemView.alpha = 1f
+                itemView.scaleX = 1f;
+                itemView.scaleY = 1f;
             }
+            itemView.setOnClickListener {
+                listener.onItemClicked(adapterPosition)
+            }
+            itemView.setOnLongClickListener(this)
+        }
+
+        override fun onLongClick(v: View): Boolean {
+            listener.onItemLongClicked(adapterPosition);
+            return true;
         }
     }
+
 
 }

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+<!--    <item-->
+<!--        android:id="@+id/action_select_all"-->
+<!--        android:icon="@drawable/ic_select_all"-->
+<!--        android:title="Select All"-->
+<!--        app:showAsAction="always" />-->
+    <item
+        android:id="@+id/action_share_all"
+        android:icon="@drawable/ic_share"
+        android:title="Share Selected"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_save_all"
+        android:icon="@drawable/ic_save"
+        android:title="Save Selected"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_delete_all"
+        android:icon="@drawable/ic_delete"
+        android:title="Delete Selected"
+        app:showAsAction="always" />
+
+
+
+</menu>

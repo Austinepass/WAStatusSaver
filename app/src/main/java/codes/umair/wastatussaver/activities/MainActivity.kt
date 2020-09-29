@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
@@ -32,10 +33,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        mSectionsPageAdapter =
-            SectionsPageAdapter(
-                supportFragmentManager
-            )
+        mSectionsPageAdapter = SectionsPageAdapter(supportFragmentManager)
 
 
         tabs.setupWithViewPager(container)
@@ -54,9 +52,19 @@ class MainActivity : AppCompatActivity() {
         )
         adapter.addFragment(RecentStatusFragment(), "Recent Status")
         adapter.addFragment(SavedStatusFragment(), "Saved Status")
+        adapter.setPrimaryItem(viewPager,0,RecentStatusFragment())
         viewPager.adapter = adapter
+
     }
 
+    override fun onBackPressed() {
+        if (container.currentItem != 0){
+            container.setCurrentItem(0,true)
+        }else{
+            super.onBackPressed()
+        }
+
+    }
     private fun checkPermission() {
         val rationale = "Please provide Storage permission to save Status."
         val permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -109,34 +117,47 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when {
-            item.itemId === R.id.action_help -> {
+        when(item.itemId) {
+             R.id.action_help -> {
                 help()
             }
-            item.itemId === R.id.action_share -> {
+            R.id.action_share -> {
                 share()
             }
-            item.itemId === R.id.action_rateus -> {
+            R.id.action_rateus -> {
                 rateUs()
             }
-            item.itemId === R.id.action_feedback -> {
+            R.id.action_feedback -> {
                 sendFeedback()
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun rateUs() = try {
-        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
-    } catch (e: ActivityNotFoundException) {
-        e.printStackTrace()
-        Toast.makeText(this, e.localizedMessage, Toast.LENGTH_SHORT).show()
-        startActivity(
-            Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
-            )
-        )
+    private fun rateUs() {
+        MaDialog.Builder(this)
+            .setImage(R.drawable.rating)
+            .setTitle("Rate WA Status Saver")
+            .setMessage("Tell others what you think about WA Status Saver")
+            .setPositiveButtonText("Sure")
+            .setPositiveButtonListener {
+                try {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
+                } catch (e: ActivityNotFoundException) {
+                    e.printStackTrace()
+                    Toast.makeText(this, e.localizedMessage, Toast.LENGTH_SHORT).show()
+                    startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
+
+                        )
+                    )
+                }
+            }
+            .setNegativeButtonText("Not Now")
+            .setNegativeButtonListener {  }
+            .build()
     }
 
     private fun sendFeedback() {

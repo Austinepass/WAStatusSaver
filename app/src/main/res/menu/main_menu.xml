@@ -9,12 +9,19 @@
         app:showAsAction="always" />
 
     <item
+        android:id="@+id/action_rateus"
+        android:icon="@drawable/ic_star"
+        android:title="Rate us"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/action_share"
-        android:title="Share" />
+        android:icon="@drawable/ic_share"
+        android:title="Share"
+        app:showAsAction="ifRoom"/>
+
     <item
         android:id="@+id/action_feedback"
         android:title="Send feedback" />
-    <item
-        android:id="@+id/action_rateus"
-        android:title="Rate us" />
+
 </menu>
