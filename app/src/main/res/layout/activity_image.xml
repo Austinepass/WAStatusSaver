@@ -7,11 +7,11 @@
     android:background="#DD323232"
     tools:context=".activities.ImageActivity">
 
-    <ImageView
+    <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/statusImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="35dp"
+        android:layout_margin="12dp"
         app:layout_constraintBottom_toTopOf="@+id/adView2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
