@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.pm.LauncherApps
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
@@ -21,13 +22,14 @@ import codes.umair.wastatussaver.fragments.SavedStatusFragment
 import com.nabinbhandari.android.permissions.PermissionHandler
 import com.nabinbhandari.android.permissions.Permissions
 import kotlinx.android.synthetic.main.activity_main.*
+import spencerstudios.com.jetdblib.JetDB
 import umairayub.madialog.MaDialog
+import umairayub.madialog.MaDialogListener
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mSectionsPageAdapter: SectionsPageAdapter
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -138,25 +140,31 @@ class MainActivity : AppCompatActivity() {
         MaDialog.Builder(this)
             .setImage(R.drawable.rating)
             .setTitle("Rate WA Status Saver")
-            .setMessage("Tell others what you think about WA Status Saver")
+            .setMessage(getString(R.string.rateus_message))
             .setPositiveButtonText("Sure")
-            .setPositiveButtonListener {
-                try {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
-                } catch (e: ActivityNotFoundException) {
-                    e.printStackTrace()
-                    Toast.makeText(this, e.localizedMessage, Toast.LENGTH_SHORT).show()
-                    startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
+            .setPositiveButtonListener(object : MaDialogListener{
+                override fun onClick() {
+                    try {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
+                    } catch (e: ActivityNotFoundException) {
+                        e.printStackTrace()
+                        Toast.makeText(this@MainActivity, e.localizedMessage, Toast.LENGTH_SHORT).show()
+                        startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
 
+                            )
                         )
-                    )
+                    }
                 }
-            }
+            })
             .setNegativeButtonText("Not Now")
-            .setNegativeButtonListener {  }
+            .setNegativeButtonListener(object : MaDialogListener {
+                override fun onClick() {
+
+                }
+            })
             .build()
     }
 
@@ -182,7 +190,11 @@ class MainActivity : AppCompatActivity() {
             .setTitle("Help")
             .setMessage(resources.getString(R.string.help_message))
             .setPositiveButtonText("OK")
-            .setPositiveButtonListener {}
+            .setPositiveButtonListener (object : MaDialogListener{
+                override fun onClick() {
+
+                }
+            })
             .build()
     }
 }
