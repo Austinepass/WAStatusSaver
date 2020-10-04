@@ -4,9 +4,7 @@ import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.content.pm.LauncherApps
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
@@ -22,7 +20,6 @@ import codes.umair.wastatussaver.fragments.SavedStatusFragment
 import com.nabinbhandari.android.permissions.PermissionHandler
 import com.nabinbhandari.android.permissions.Permissions
 import kotlinx.android.synthetic.main.activity_main.*
-import spencerstudios.com.jetdblib.JetDB
 import umairayub.madialog.MaDialog
 import umairayub.madialog.MaDialogListener
 

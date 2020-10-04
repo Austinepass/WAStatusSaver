@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.view.ActionMode
-import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +23,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import umairayub.madialog.MaDialog
+import umairayub.madialog.MaDialogListener
 import java.io.File
 
 
@@ -107,7 +107,7 @@ class SavedStatusFragment : Fragment(), StatusAdapter.OnItemClickListener {
     }
 
     override fun onItemLongClicked(position: Int) {
-        enableActionMode(position);
+        enableActionMode(position)
     }
 
     override fun onItemClicked(position: Int) {
@@ -126,7 +126,7 @@ class SavedStatusFragment : Fragment(), StatusAdapter.OnItemClickListener {
                 startActivity(intent)
             }
         } else {
-            toggleSelection(position);
+            toggleSelection(position)
         }
 
     }
@@ -222,17 +222,23 @@ class SavedStatusFragment : Fragment(), StatusAdapter.OnItemClickListener {
                 }
                 R.id.action_delete_all -> {
                     // delete all the selected rows
-                    MaDialog.Builder(activity)
+                    MaDialog.Builder(ctx)
                         .setTitleTextColor(Color.RED)
                         .setTitle("Delete?")
                         .setMessage("Are you sure you want to delete all selected items?")
                         .setPositiveButtonText("Yes")
-                        .setPositiveButtonListener {
-                            deleteAllSelected()
-                            mode.finish()
-                        }
+                        .setPositiveButtonListener(object : MaDialogListener {
+                            override fun onClick() {
+                                deleteAllSelected()
+                                mode.finish()
+                            }
+                        })
                         .setNegativeButtonText("Cancel")
-                        .setNegativeButtonListener { }
+                        .setNegativeButtonListener(object : MaDialogListener {
+                            override fun onClick() {
+
+                            }
+                        })
                         .build()
 
                     true

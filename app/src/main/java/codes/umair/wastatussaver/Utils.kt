@@ -7,11 +7,10 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Environment
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import androidx.core.content.FileProvider
-import codes.umair.wastatussaver.adapters.StatusAdapter
 import umairayub.madialog.MaDialog
+import umairayub.madialog.MaDialogListener
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -21,7 +20,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class Utils() {
+class Utils {
     private val DIRECTORY_TO_SAVE_MEDIA_NOW = "/Status Saver/"
 
     fun getListFiles(parentDir: File): ArrayList<File> {
@@ -94,19 +93,25 @@ class Utils() {
                             .setMessage("Are you sure you want to delete this file?")
                             .setPositiveButtonText("Yes")
                             .setNegativeButtonText("Cancel")
-                            .setPositiveButtonListener {
-                                sourceFile.delete()
-                                scanFile(ctx,sourceFile)
-                                if (!sourceFile.exists()) {
-                                    Toast.makeText(
-                                        ctx,
-                                        "File deleted!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    (ctx as Activity).finish()
+                            .setPositiveButtonListener(object : MaDialogListener {
+                                override fun onClick() {
+                                    sourceFile.delete()
+                                    scanFile(ctx, sourceFile)
+                                    if (!sourceFile.exists()) {
+                                        Toast.makeText(
+                                            ctx,
+                                            "File deleted!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        (ctx as Activity).finish()
+                                    }
                                 }
-                            }
-                            .setNegativeButtonListener {}
+                            })
+                            .setNegativeButtonListener(object : MaDialogListener {
+                                override fun onClick() {
+
+                                }
+                            })
                             .build()
 
 
